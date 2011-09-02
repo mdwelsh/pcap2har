@@ -88,6 +88,7 @@ def gather_messages(MessageClass, tcpdir):
         try:
             msg = MessageClass(tcpdir, pointer)
         except dpkt.Error as error: # if the message failed
+            logging.exception('dpkt Error parsing HTTP')
             if pointer == 0: # if this is the first message
                 raise http.Error('Invalid http')
             else: # we're done parsing messages

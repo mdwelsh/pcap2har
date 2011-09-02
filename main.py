@@ -28,7 +28,8 @@ options, args = parser.parse_args()
 settings.process_pages = options.pages
 
 # setup logs
-logging.basicConfig(filename='pcap2har.log', level=logging.INFO)
+#logging.basicConfig(filename='pcap2har.log', level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 # get filenames, or bail out with usage error
 if len(args) == 2:

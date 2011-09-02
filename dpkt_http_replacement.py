@@ -29,8 +29,20 @@ def parse_headers(f):
             d[k] = v
     return d
 
-def parse_body(f, headers):
-    """Return HTTP body parsed from a file object, given HTTP header dict."""
+def parse_body(f, headers, strict=True):
+    """Return HTTP body parsed from a file object, given HTTP header dict.
+
+    Args:
+      f: File object to parse packets from.
+      headers: Dict containing HTTP headers.
+      strict: Whether the body size must match the content-length header.
+
+    Returns:
+      The parsed HTTP body.
+
+    Raises:
+      dpkt.NeedData: If the body is incomplete.
+    """
     if headers.get('transfer-encoding', '').lower() == 'chunked':
         l = []
         found_end = False
@@ -55,7 +67,7 @@ def parse_body(f, headers):
     elif 'content-length' in headers:
         n = int(headers['content-length'])
         body = f.read(n)
-        if len(body) != n:
+        if strict and len(body) != n:
             raise dpkt.NeedData('short body (missing %d bytes)' % (n - len(body)))
     else:
         # XXX - need to handle HTTP/0.9
@@ -85,7 +97,7 @@ class Message(dpkt.Packet):
         # Parse headers
         self.headers = parse_headers(f)
         # Parse body
-        self.body = parse_body(f, self.headers)
+        self.body = parse_body(f, self.headers, strict=False)
         # Save the rest
         self.data = f.read()
 
