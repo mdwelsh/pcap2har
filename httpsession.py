@@ -10,6 +10,8 @@ import http
 import logging as log
 import settings
 
+import dpkt.dpkt
+
 class Entry:
     '''
     represents an HTTP request/response in a form suitable for writing to a HAR

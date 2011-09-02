@@ -1,5 +1,5 @@
-from sortedcollection import SortedCollection
-import tcp
+from ..sortedcollection import SortedCollection
+import chunk as tcp
 from operator import itemgetter
 
 class Direction:

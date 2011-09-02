@@ -1,9 +1,10 @@
 import gzip
 import zlib
 import cStringIO
-import dpkt_http_replacement as dpkt_http
-import http
-from mediatype import MediaType
+from .. import dpkt_http_replacement as dpkt_http
+import common as http
+import message
+from ..mediatype import MediaType
 import logging as log
 #from http import DecodingError # exception class from parent module
 
@@ -14,7 +15,7 @@ try:
 except ImportError:
     UnicodeDammit = None
 
-class Response(http.Message):
+class Response(message.Message):
     '''
     HTTP response.
     Members:
@@ -26,7 +27,7 @@ class Response(http.Message):
     * original_encoding: string, original text encoding/charset/whatever
     '''
     def __init__(self, tcpdir, pointer):
-        http.Message.__init__(self, tcpdir, pointer, dpkt_http.Response)
+        message.Message.__init__(self, tcpdir, pointer, dpkt_http.Response)
         # uncompress body if necessary
         self.handle_compression()
         # get mime type
@@ -72,6 +73,10 @@ class Response(http.Message):
                 self.body = self.raw_body
             elif encoding == 'identity':
                 # no compression
+                self.body = self.raw_body
+            elif 'sdch' in encoding:
+                # ignore sdch, a Google proposed modification to HTTP/1.1
+                # not in RFC 2616.
                 self.body = self.raw_body
             else:
                 # I'm pretty sure the above are the only allowed encoding types
