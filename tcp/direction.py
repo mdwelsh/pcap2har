@@ -1,6 +1,9 @@
+import logging
 from ..sortedcollection import SortedCollection
 import chunk as tcp
 from operator import itemgetter
+from pcap2har import settings
+import packet
 
 class Direction:
     '''
@@ -31,6 +34,7 @@ class Direction:
         self.final_arrival_pointer = None
         self.chunks = []
         self.final_data_chunk = None
+
     def add(self, pkt):
         '''
         Merge the packet into the first chunk it overlaps with. If data was
@@ -113,6 +117,8 @@ class Direction:
         that self.data can be decided upon. Also calculates final_arrival for
         any packets that arrived while seq_start was None
         '''
+        if settings.pad_missing_tcp_data:
+          self.pad_missing_data()
         self.finished = True
         # calculate final_arrival
         if not self.final_arrival_data:
@@ -121,8 +127,10 @@ class Direction:
                 if vertex[1].ts > peak_time:
                     peak_time = vertex[1].ts
                     self.final_arrival_data.insert((vertex[0], vertex[1].ts))
+
         if self.chunks and not self.final_data_chunk:
             self.final_data_chunk = self.chunks[0]
+
     def new_chunk(self, pkt):
         '''
         creates a new tcp.Chunk for the pkt to live in. Only called if an
@@ -173,3 +181,17 @@ class Direction:
             return self.final_arrival_data.find_le(seq_num)[1]
         except:
             return None
+
+    def pad_missing_data(self):
+      '''Pad missing data in the flow with zero bytes.'''
+      prev_chunk = self.chunks[0]
+      for chunk in self.chunks[1:]:
+        gap = chunk.seq_start - prev_chunk.seq_end
+        if gap > 0:
+          logging.info('Padding %d missing bytes at %d',
+                       gap, prev_chunk.seq_end)
+          first_chunk_pkt = self.seq_arrival(chunk.seq_start)
+          chunk_ts = first_chunk_pkt.ts
+          pad_pkt = packet.PadPacket(prev_chunk.seq_end, gap, chunk_ts)
+          self.add(pad_pkt)
+        prev_chunk = chunk
