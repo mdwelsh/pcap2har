@@ -73,6 +73,10 @@ class Response(http.Message):
             elif encoding == 'identity':
                 # no compression
                 self.body = self.raw_body
+            elif 'sdch' in encoding:
+                # ignore sdch, a Google proposed modification to HTTP/1.1
+                # not in RFC 2616.
+                self.body = self.raw_body
             else:
                 # I'm pretty sure the above are the only allowed encoding types
                 # see RFC 2616 sec 3.5 (http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.5)
