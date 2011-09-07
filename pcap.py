@@ -1,6 +1,5 @@
 import dpkt
 from pcaputil import *
-from socket import inet_ntoa
 
 import logging as log
 import os
