@@ -1,5 +1,7 @@
 import dpkt
-from ..pcaputil import *
+from ..pcaputil import friendly_socket
+from ..pcaputil import friendly_tcp_flags
+from ..pcaputil import friendly_data
 
 class Packet(object):
     '''

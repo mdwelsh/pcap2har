@@ -1,5 +1,9 @@
 import http
-import json
+try:
+  import json
+except ImportError:
+  # In order to work with Google AppEngine
+  from django.utils import simplejson as json
 
 '''
 functions and classes for generating HAR data from parsed http data

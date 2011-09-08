@@ -1,3 +1,4 @@
+import cgi
 import urlparse
 #import dpkt.http this is buggy
 from .. import dpkt_http_replacement as dpkt_http
@@ -20,4 +21,4 @@ class Request(http.Message):
         fullurl = urlparse.ParseResult('http', self.host, uri.path, uri.params, uri.query, uri.fragment)
         self.fullurl = fullurl.geturl()
         self.url, frag = urlparse.urldefrag(self.fullurl)
-        self.query = urlparse.parse_qs(uri.query, keep_blank_values=True)
+        self.query = cgi.parse_qs(uri.query, keep_blank_values=True)

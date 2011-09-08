@@ -112,7 +112,9 @@ class Flow:
         writes out the data in the flows to two files named basename-fwd.dat and
         basename-rev.dat.
         '''
-        with open(basename + '-fwd.dat', 'wb') as f:
-            f.write(self.fwd.data)
-        with open(basename + '-rev.dat', 'wb') as f:
-            f.write(self.rev.data)
+        f = open(basename + '-fwd.dat', 'wb')
+        f.write(self.fwd.data)
+        f.close()
+        f = open(basename + '-rev.dat', 'wb')
+        f.write(self.rev.data)
+        f.close()
