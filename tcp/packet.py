@@ -48,7 +48,7 @@ class Packet(object):
     def __eq__(self, other):
         return not self.__ne__(other)
     def __ne__(self, other):
-        if isinstance(other, TCPPacket):
+        if isinstance(other, Packet):
             return cmp(self, other) != 0
         else:
             return True
