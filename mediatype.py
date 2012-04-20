@@ -1,4 +1,6 @@
+import logging as log
 import re
+import settings
 
 class MediaType(object):
     '''
@@ -17,6 +19,9 @@ class MediaType(object):
     mediatype_re = re.compile(
         r'^([\w\-+.]+)/([\w\-+.]+)((?:\s*;\s*[\w\-]+=[^;]+)*)\s*$'
     )
+    mediatype_trailing_semicolon_re = re.compile(
+        r'^([\w\-+.]+)/([\w\-+.]+)((?:\s*;\s*[\w\-]+=[^;]+)*);\s*$'
+    )
     # RE for parsing name-value pairs
     nvpair_re = re.compile(r'^\s*([\w\-]+)=([^;\s]+)\s*$')
     # constructor
@@ -26,6 +31,10 @@ class MediaType(object):
         data = string, the media type string
         '''
         match = self.mediatype_re.match(data)
+        if not match and settings.allow_trailing_semicolon:
+          match = self.mediatype_trailing_semicolon_re.match(data)
+          if match:
+            log.warning('Allowing mediatype with trailing semicolon: %s' % data)
         if match:
             # get type/subtype
             self.type = match.group(1).lower()
