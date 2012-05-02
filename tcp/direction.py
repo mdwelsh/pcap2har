@@ -106,8 +106,8 @@ class Direction:
             if self.chunks:
                 return self.chunks[0].seq_start
             else:
-                log.warning('getting seq_start from finished tcp.Direction '
-                            'with no handshake and no data')
+                logging.warning('getting seq_start from finished tcp.Direction '
+                                'with no handshake and no data')
                 return None
         else:
             return None
