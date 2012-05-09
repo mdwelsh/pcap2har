@@ -59,7 +59,7 @@ def parse_body(f, headers):
         if headers['content-length'] == '0,0':
           n = 0
         else:
-          n = int(headers['content-length']
+          n = int(headers['content-length'])
         body = f.read(n)
         if len(body) != n:
           logging.warn('HTTP content-length mismatch: expected %d, got %d', n,
