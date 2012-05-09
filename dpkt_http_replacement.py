@@ -55,17 +55,17 @@ def parse_body(f, headers):
             raise dpkt.NeedData('premature end of chunked body')
         body = ''.join(l)
     elif 'content-length' in headers:
-        try:
-          n = int(headers['content-length'])
-          body = f.read(n)
-          if settings.strict_http_parse_body and len(body) != n:
-              raise dpkt.NeedData('short body (missing %d bytes)' % (n - len(body)))
-        except ValueError as err:
-          logging.exception('Unable to read content-length', err)
+        # Have observed malformed 0,0 content lengths
+        if headers['content-length'] == '0,0':
+          n = 0
+        else:
+          n = int(headers['content-length']
+        body = f.read(n)
+        if len(body) != n:
+          logging.warn('HTTP content-length mismatch: expected %d, got %d', n,
+                       len(body))
           if settings.strict_http_parse_body:
-            raise err
-          else:
-            body = ''
+            raise dpkt.NeedData('short body (missing %d bytes)' % (n - len(body)))
     else:
         # XXX - need to handle HTTP/0.9
         body = ''
